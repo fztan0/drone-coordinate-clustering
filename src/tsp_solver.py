@@ -8,10 +8,11 @@ returning:
     2. Array storing the launching pad coordinates of the drones (0-indexed). There should be k elements in array
 """
 # def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[np.ndarray, np.array, np.ndarray]:
-def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[tuple[float,float]], np.ndarray]:
+def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[tuple[float,float]], np.ndarray, int]:
     converge = False
     initial_launch_pads = math_utilities.random_seed(bounds, k)
     oldClustering = initial_launch_pads
+    iteration = 0
     while not converge:
         #standard np would return a float for np.zeros but need to return a int 
         clustering_assignment = np.zeros(len(points), dtype=int)
@@ -22,9 +23,9 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
             closestDrone = -1
             shortestDistance = math.inf
             #iterates through all of the launch pad locations
-            for i in range(len(initial_launch_pads)):
+            for i in range(len(oldClustering)):
                 #tries to find the best launch pad to return the shortest distance between the point
-                calculateDistance = math_utilities.euclidean_distance(initial_launch_pads[i], points[j])
+                calculateDistance = math_utilities.euclidean_distance(oldClustering[i], points[j])
                 if shortestDistance > calculateDistance:
                     shortestDistance = calculateDistance
                     closestDrone = i 
@@ -41,14 +42,16 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
             cluster_array = np.array(k_cluster_group[i])
             #if there is no cluster for one of the centroids keep original. this will allow for algorithm to converge
             if(cluster_array.size == 0):
-                new_centroid[i] = initial_launch_pads[i]
+                new_centroid[i] = oldClustering[i]
             else:
                 #stack it from 1d to 2d. 
-                np.vstack(cluster_array)
-                x,y = math_utilities.generate_centroid(cluster_array)
+                cluster_change = np.vstack(cluster_array)
+                x,y = math_utilities.generate_centroid(cluster_change)
                 new_centroid[i] = (x,y)
-        if np.array_equal(oldClustering, new_centroid):
+        #does a tolerance to ensure that the difference is within 1e-03
+        if np.allclose(oldClustering, new_centroid, atol = 1e-03):
             converge = True
         else:
-            oldClustering = new_centroid
-    return k_cluster_group, new_centroid
+            oldClustering = new_centroid.copy()
+            iteration = iteration + 1
+    return k_cluster_group, new_centroid, iteration
