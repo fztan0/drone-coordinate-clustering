@@ -1,11 +1,12 @@
 import file_handler
 import math_utilities
+import tsp_solver
 
 def main():
     input_data = file_handler.load_file_coordinates(file_handler.get_file_name())
-
-    distance_matrix = math_utilities.generate_distance_matrix(input_data)
-    print(distance_matrix)
+    bounds = math_utilities.calcDimension(input_data)
+    clustering_assignment, new_centroid = tsp_solver.generate_k_means_clustering(4, input_data, bounds)
+    print(new_centroid)
 
 if __name__ == "__main__":
     main()
