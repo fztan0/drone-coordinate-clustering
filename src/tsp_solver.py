@@ -106,11 +106,39 @@ def generate_nearestNeighbor_route(k_cluster_array: list[list[tuple[float,float]
       remaining_locations.remove(shortestLocation)
       #iterates through remaining locations to find the shortest distance
       for x in remaining_locations:
-        if(shortestNodeDist > math_utilities.euclidean_distance(selectedLocation,x)):
-          shortestNodeDist = math_utilities.euclidean_distance(selectedLocation,x)
+        euclidean_distance = 0.0
+        euclidean_distance = math_utilities.euclidean_distance(selectedLocation,x)
+        if(shortestNodeDist > euclidean_distance):
+          shortestNodeDist = euclidean_distance
           shortestLocation = x
       location = shortestLocation
       routes[k_value].append(location)
     #add the centroid at the end in order to do distance calculation
     routes[k_value].append(starting_pad)
   return routes
+
+#run k_mean_clustering 10 times to get shortest total distance
+def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[list[tuple[float,float]]], np.ndarray, int, list[list[tuple[float,float]]], np.array, int]:
+  bestDistance = math.inf
+  bestRoute = []
+  clustering = []
+  route_distance = []
+  bestIteration = 0
+  centroid = []
+  for i in range(10):
+    clustering_assignment, new_centroids, iteration = generate_k_means_clustering(k, points, bounds)
+    route = generate_nearestNeighbor_route(clustering_assignment, new_centroids, k)
+    distance_each_clustering = compute_route_distance(route, k)
+    #round to the tenth's place
+    round_distance = 0
+    round_distance = np.ceil(distance_each_clustering)
+    #calculates the total distance 
+    total_distance = np.sum(round_distance)
+    if(bestDistance > total_distance):
+      clustering = clustering_assignment
+      centroid = new_centroids
+      bestIteration = iteration
+      bestRoute = route
+      route_distance = round_distance
+      bestDistance = total_distance
+  return clustering, centroid, bestIteration, bestRoute, route_distance, bestDistance
