@@ -4,11 +4,13 @@ import math
 
 """
 returning:
-    1. (Updated datapoints containing (x,y,k) k representing the clustering of the data point). 
-    2. Array storing the launching pad coordinates of the drones (0-indexed). There should be k elements in array
+    1. Returns a list of arrays. Each index represents a k (0- (k-1)) which stores array of locations to visit
+    2. Converged drone launch pads that are strategically placed to have high clustering
+    3. Tracks the number of iterations it took to converge
+    NOTE: Clustering 
 """
 # def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[np.ndarray, np.array, np.ndarray]:
-def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[tuple[float,float]], np.ndarray, int]:
+def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[list[tuple[float,float]]], np.ndarray, int]:
     converge = False
     initial_launch_pads = math_utilities.random_seed(bounds, k)
     oldClustering = initial_launch_pads
@@ -32,10 +34,12 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
             #keeps track of the respective clustering for each point
             clustering_assignment[j] = closestDrone
         clustering_assignment.astype(int)
+        #assigns the points to their respective clustering group
         for i in range(len(points)):
             clusteringAssignment = clustering_assignment[i]
             location = points[i]
-            k_cluster_group[clusteringAssignment].append(location)
+            #need to convert each point to a tuple to allow in a later function to be able to remove points from a list (wont work if its a numpy array)
+            k_cluster_group[clusteringAssignment].append(tuple(location))
         #recalculating the new centroid
         new_centroid = np.zeros((k,2))
         for i in range(k):
@@ -48,10 +52,67 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
                 cluster_change = np.vstack(cluster_array)
                 x,y = math_utilities.generate_centroid(cluster_change)
                 new_centroid[i] = (x,y)
-        #does a tolerance to ensure that the difference is within 1e-03
+        #does a tolerance to ensure that the difference is within 1e-03 to be able to converge
         if np.allclose(oldClustering, new_centroid, atol = 1e-03):
             converge = True
         else:
+            #insures you are getting an exact copy in numpy
             oldClustering = new_centroid.copy()
             iteration = iteration + 1
     return k_cluster_group, new_centroid, iteration
+
+"""
+Parameter: Route - stores all of the points with respect to their cluster (also includes the centroid)
+Returns: This return returns an array (k size) that stores the total distance of each of the routes
+"""
+def compute_route_distance(route: list[list[tuple[float,float]]], k:int) -> np.array:
+  total_cluster_distance = []
+  #loop over all of the clusters and calculate the total distance for each
+  for k_value in range(k):
+    total_distance = 0.0
+    individualRoute = route[k_value]
+    for i in range(len(individualRoute) - 1):
+      from_node = individualRoute[i]
+      to_node = individualRoute[i + 1]
+      total_distance += math_utilities.euclidean_distance(from_node,to_node)
+    total_cluster_distance.append(total_distance)
+  return total_cluster_distance
+
+#note: routes wont append the launch pad at the beginning & the end
+#n represents the size of the 
+"""
+Returns routes starting from the launch pad to all of its respective cluster than back to the launch pad. Uses nearest neighbor implementation
+"""
+def generate_nearestNeighbor_route(k_cluster_array: list[list[tuple[float,float]]], startingCentroid: np.ndarray, k: int) -> list[list[tuple[float,float]]]:
+  routes = [ [] for  _ in range(k)]
+  #get the route for all of the clusters and store it in route
+  for k_value in range(k):
+    #initialize the dictionary
+    remaining_locations = []
+    routes[k_value] = []
+    cluster = k_cluster_array[k_value]
+    starting_pad = startingCentroid[k_value]
+    #remaining_location stores all of the points that the cluster needs to visit in a list
+    remaining_locations = list(cluster)
+    #append the centroid since that is the starting point
+    remaining_locations.append(tuple(starting_pad))
+    routes[k_value].append(tuple(starting_pad))
+    shortestLocation = tuple(starting_pad)
+    while len(remaining_locations) > 1:
+      shortestNodeDist = math.inf
+      #pop off value
+      selectedLocation = shortestLocation
+      remaining_locations.remove(shortestLocation)
+      #iterates through remaining locations to find the shortest distance
+      for x in remaining_locations:
+        #keeps track of the index to be able to pop it off afterwards
+        if(shortestNodeDist > math_utilities.euclidean_distance(selectedLocation,x)):
+          shortestNodeDist = math_utilities.euclidean_distance(selectedLocation,x)
+          shortestLocation = x
+      location = shortestLocation
+      routes[k_value].append(location)
+    routes[k_value].append(starting_pad)
+  return routes
+
+ # selectedLocation = starting_pad
+    # shortestLocation = starting_pad

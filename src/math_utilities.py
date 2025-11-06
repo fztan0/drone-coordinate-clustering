@@ -3,8 +3,13 @@ import random
 
 # Calculate Euclidean Distance between two points in n-dimensional space
 # https://stackoverflow.com/questions/1401712/how-can-the-euclidean-distance-be-calculated-with-numpy
+"""
+NOTE: parameters can be either a tuple or an numpy array since we are converting it to numpy inside the function
+"""
 def euclidean_distance(point_a: numpy.ndarray, point_b: numpy.ndarray) -> float:
-    return numpy.linalg.norm(point_a - point_b)
+    a = numpy.array(point_a)
+    b = numpy.array(point_b)
+    return numpy.linalg.norm(a - b)
 
 # Pairwise distance matrix
 def generate_distance_matrix(points: numpy.ndarray) -> numpy.ndarray:
