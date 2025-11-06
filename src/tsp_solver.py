@@ -91,28 +91,26 @@ def generate_nearestNeighbor_route(k_cluster_array: list[list[tuple[float,float]
     remaining_locations = []
     routes[k_value] = []
     cluster = k_cluster_array[k_value]
-    starting_pad = startingCentroid[k_value]
+    #must convert to a tuple in order to be able to remove it from a list
+    starting_pad = tuple(startingCentroid[k_value])
     #remaining_location stores all of the points that the cluster needs to visit in a list
     remaining_locations = list(cluster)
     #append the centroid since that is the starting point
-    remaining_locations.append(tuple(starting_pad))
-    routes[k_value].append(tuple(starting_pad))
-    shortestLocation = tuple(starting_pad)
+    remaining_locations.append(starting_pad)
+    routes[k_value].append(starting_pad)
+    shortestLocation = starting_pad
     while len(remaining_locations) > 1:
       shortestNodeDist = math.inf
-      #pop off value
       selectedLocation = shortestLocation
+      #remove value
       remaining_locations.remove(shortestLocation)
       #iterates through remaining locations to find the shortest distance
       for x in remaining_locations:
-        #keeps track of the index to be able to pop it off afterwards
         if(shortestNodeDist > math_utilities.euclidean_distance(selectedLocation,x)):
           shortestNodeDist = math_utilities.euclidean_distance(selectedLocation,x)
           shortestLocation = x
       location = shortestLocation
       routes[k_value].append(location)
+    #add the centroid at the end in order to do distance calculation
     routes[k_value].append(starting_pad)
   return routes
-
- # selectedLocation = starting_pad
-    # shortestLocation = starting_pad
