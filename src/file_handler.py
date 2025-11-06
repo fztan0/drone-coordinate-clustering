@@ -14,20 +14,32 @@ def get_file_name() -> str:
 
     return input_file_name
 
-# def get_user_choice(output_file_name: str) -> numpy:
-#     user_choice = input("Please select your choice 1 to 4:")
-
-#     choice = int(user_choice)
-#     if not user_choice:
-#         raise ValueError("Invalid choice")
+def get_user_choice(output_file_name: str, selected_distances: list[list[int]], selected_routes: list[list[tuple[float,float]]]) -> tuple[list, int]:
+    user_choice = input("Please select your choice 1 to 4:")
+    full_path = output_file_name
+    file_name = os.path.basename(full_path)
+    choice = int(user_choice)
+    if not user_choice:
+        raise ValueError("Invalid choice")
     
-#     # list containing all the solutions; easy output
-#     output_files = []
-#     for x in range(1, choice + 1):
-#         output_files.append(f"{output_file_name}_{x}_SOLUTION_{sub_distance}.txt")
-
-#     return output_files
-
+    # list containing all the solutions; easy output
+    output_files = []
+    distance = selected_distances[choice-1]
+    for i in range(choice):
+        output_files.append(f"{file_name}_{i+1}_SOLUTION_{int(distance[i])}.txt")
+    for i in range(len(output_files)):
+       output_path = os.path.join(os.getcwd(), "output", output_file_name)
+       os.makedirs(os.path.dirname(output_path), exist_ok = True)
+       try:
+            with open(output_path, 'w') as file:
+                for node in selected_routes[i]:
+                    file.write(f"{node + 1}\n") # each subsequent line is a node index
+                # remove last newline character to match output format
+                file.truncate(file.tell() - len(os.linesep))
+       except Exception as e:
+            print(f"Error writing to file: {e}\nAborting.")
+            exit()
+    return output_files, choice
 
 def compute_possible_solutions() -> None:
     print(f"ComputePossibleSolutions")
@@ -49,17 +61,22 @@ def compute_possible_solutions() -> None:
         clustering_assignment, new_centroids, iteration, route, cluster_distance, total_distance = tsp_solver.generate_best_k_clusterings(k+1, input_data, bounds)
         for i in range(k+1):
             #adding the chosen distances and routes in order to access them when the user makes the choice
-            selected_distances[k].append(cluster_distance[i])
-            selected_routes[k].append(route[i])
-        print(f"{k+1}) If you use {k+1} drone(s), the total route will be {total_distance} meters")
+            selected_distances[k].append(int(cluster_distance[i]))
+            extract_route = route[i]
+            #this slices the first and last element in the array
+            selected_routes[k].append(extract_route[1:-1])
+        print(f"{k+1}) If you use {k+1} drone(s), the total route will be {int(total_distance)} meters")
         for i in range(k+1):
-            print(f"    {roman_numerials[i]}. Landing Pad {i+1} should be at {new_centroids[i]}, serving {len(clustering_assignment[i])} locations, route is {cluster_distance[i]} meters")
+            x,y = new_centroids[i]
+            print(f"    {roman_numerials[i]}. Landing Pad {i+1} should be at ({int(x)},{int(y)}), serving {len(clustering_assignment[i])} locations, route is {int(cluster_distance[i])} meters")
 
     # "please select your choice 1 to 4:"
-    #file_solutions = get_user_choice(output_file_name)
+    file_solutions, choice = get_user_choice(output_file_name, selected_distances, selected_routes)
 
-    # might include line 51 to be apart of save_route_to_text_file 
-    #print(f"Writing {file_solutions} to disk.")
+
+    #use .join to seperate each file in the list by a comma
+    separator = ", "
+    print(f"Writing {separator.join(file_solutions)} to disk.")
 
 def load_file_coordinates(file_path: str) -> numpy.ndarray:
     # numpy.loadtxt() should already handle majority of error flags for us
