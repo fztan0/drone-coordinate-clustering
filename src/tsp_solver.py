@@ -142,3 +142,17 @@ def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -
       route_distance = round_distance
       bestDistance = total_distance
   return clustering, centroid, bestIteration, bestRoute, route_distance, bestDistance
+
+#given a route attempts to match it with its respective location number (indicies + 1)
+#route parameter contains a list of k lists. inside each k lists is the clustering of the points 
+#selected_route that contains the coordinates of each route that we have to parse
+def indiciesRoute(k: int, route: dict, selected_route : list[list[tuple[float,float]]]) -> list[list[int]]:
+  pointsOrder = [ [] for  _ in range(k)]
+  for i in range(k):
+    for coordinate in selected_route[i]:
+      #if coordinate is in the input data then include it in pointsOrder
+      if coordinate in route:
+        pointsOrder[i].append(route[coordinate])
+  return pointsOrder
+
+
