@@ -2,6 +2,7 @@ import numpy
 import os
 import math_utilities
 import tsp_solver
+import matplotlib.pyplot as plt
 
 def get_file_name() -> str:
     input_file_name = input("Enter the name of file: ")
@@ -59,8 +60,10 @@ def compute_possible_solutions() -> None:
     selected_distances = [ [] for  _ in range(4)]
     #for each k will store k routes
     selected_routes = [ [] for  _ in range(4)]
+    selected_centroids = [ [] for  _ in range(4)]
     for k in range(4):
         clustering_assignment, new_centroids, iteration, route, cluster_distance, total_distance = tsp_solver.generate_best_k_clusterings(k+1, input_data, bounds)
+        selected_centroids[k] = new_centroids
         for i in range(k+1):
             #adding the chosen distances and routes in order to access them when the user makes the choice
             #note: it is in respect to each k
@@ -76,8 +79,15 @@ def compute_possible_solutions() -> None:
     # "please select your choice 1 to 4:"
     index_route = indiciesList(input_data)
     file_solutions, choice = get_user_choice(output_file_name, selected_distances, selected_routes, index_route)
-
-
+    
+    # Adding landing pad sites to the routes for image
+    routes_with_centroids = []
+    for i in range(choice):
+        centroid = tuple(selected_centroids[choice - 1][i])
+        route_with_centroid = [centroid] + selected_routes[choice - 1][i] + [centroid]
+        routes_with_centroids.append(route_with_centroid)
+    visualize_routes(routes_with_centroids, selected_centroids[choice - 1], bounds, choice, output_file_name)
+    
     #use .join to seperate each file in the list by a comma
     separator = ", "
     print(f"Writing {separator.join(file_solutions)} to disk.")
@@ -95,5 +105,50 @@ def indiciesList(input_data: numpy.ndarray) -> dict:
         #convert coordinates to a tuple so the coordinates act as the key
         indiciesList[tuple(input_data[i])] = i + 1
     return indiciesList
+
+def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.ndarray, bounds: numpy.array, k: int, input_file_name: str):
+    output_file_name = f"{input_file_name}_OVERALL_SOLUTION.jpeg"
+    output_path = os.path.join(os.getcwd(), "output", output_file_name)
+    os.makedirs(os.path.dirname(output_path), exist_ok = True)
+
+    colors = ['#800080', '#FFA500', '#00FF00', "#FF00D4"]
+    min_x, min_y, max_x, max_y = bounds
+
+    fig, ax = plt.subplots(figsize=(19.2, 10.8))
+    ax.set_aspect('equal', adjustable='box')
+
+    for k_index in range(k):
+        route = routes[k_index]
+        color = colors[k_index % len(colors)]
+
+        if len(route) > 0:
+            x_coords = [point[0] for point in route]
+            y_coords = [point[1] for point in route]
+            ax.plot(x_coords, y_coords, color = color, linewidth = 1, alpha = 0.6, zorder = 1)
+
+            if len(route) > 2:
+                ax.scatter(x_coords[1:-1], y_coords[1:-1], color = color, alpha = 0.6, zorder = 2, s = 0)
+
+    centroid_x = centroids[:, 0]
+    centroid_y = centroids[:, 1]
+    ax.scatter(centroid_x, centroid_y, color= "#0A4977", s =200, marker = '.', edgecolors='black', linewidths = 1, zorder = 3)
+
+    width_range = abs(max_x - min_x)
+    height_range = abs(max_y - min_y)
+    if width_range == 0:
+        width_range = 1
+    if height_range == 0:
+        height_range = 1
+
+    buffer_x = width_range * 0.05
+    buffer_y = height_range * 0.05
+    ax.set_xlim(min_x - buffer_x, max_x + buffer_x)
+    ax.set_ylim(min_y - buffer_y, max_y + buffer_y)
+
+    plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', edgecolor ='none')
+    plt.close()
+    print(f"Image saved to disk as {output_file_name}")
+    return 
+
 
 #selected_routes[k].append(extract_route[1:-1])
