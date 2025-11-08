@@ -108,9 +108,10 @@ def indiciesList(input_data: numpy.ndarray) -> dict:
     return indiciesList
 
 def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.ndarray, bounds: numpy.array, k: int, input_file_name: str):
-    output_file_name = f"{input_file_name}_OVERALL_SOLUTION.jpeg"
+    file_name = os.path.basename(input_file_name)
+    output_file_name = f"{file_name}_OVERALL_SOLUTION.jpeg"
     output_path = os.path.join(os.getcwd(), "output", output_file_name)
-    os.makedirs(os.path.dirname(output_path), exist_ok = True)
+    os.makedirs(os.path.join(os.getcwd(), "output"), exist_ok = True)
 
     colors = ['#800080', '#FFA500', '#00FF00', "#FF00D4"]
     min_x, min_y, max_x, max_y = bounds
@@ -130,8 +131,8 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
             if len(route) > 2:
                 ax.scatter(x_coords[1:-1], y_coords[1:-1], color = color, alpha = 0.6, zorder = 2, s = 0)
 
-    centroid_x = centroids[:, 0]
-    centroid_y = centroids[:, 1]
+    centroid_x = centroids[:k, 0]
+    centroid_y = centroids[:k, 1]
     ax.scatter(centroid_x, centroid_y, color= "#0A4977", s =200, marker = '.', edgecolors='black', linewidths = 1, zorder = 3)
 
     width_range = abs(max_x - min_x)
