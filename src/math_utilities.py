@@ -24,12 +24,11 @@ def generate_distance_matrix(points: numpy.ndarray) -> numpy.ndarray:
     return distance_matrix
 
 def calcDimension(input_data: numpy.ndarray) -> numpy.array:
-    maxX = maxY = 0
     maxX = minX = minY = maxY = 0
     #Numpy array slicing
     #colon means selecting all of the elements(rows) and the num represents the index i want to get
     x_values = input_data[:, 0]
-    y_values = input_data[:, 1] 
+    y_values = input_data[:, 1]
     maxX = numpy.max(x_values)
     maxY = numpy.max(y_values)
     minX = numpy.min(x_values)
@@ -40,8 +39,8 @@ def calcDimension(input_data: numpy.ndarray) -> numpy.array:
 def random_seed(bounds: numpy.array, k) -> numpy.array:
     minX = int(bounds[0])
     minY = int(bounds[1])
-    maxY = int(bounds[2])
-    maxX = int(bounds[3])
+    maxX = int(bounds[2])
+    maxY = int(bounds[3])
     #for each k element store (x,y) pair
     initialPad = numpy.zeros((k,2))
     for i in range(k):

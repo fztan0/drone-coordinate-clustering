@@ -22,7 +22,7 @@ def get_user_choice(output_file_name: str, selected_distances: list[list[int]], 
     choice = int(user_choice)
     if not user_choice:
         raise ValueError("Invalid choice")
-    #this returns the routes of each clustering based on the specific choice 
+    #this returns the routes of each clustering based on the specific choice
     pointsOrder = tsp_solver.indiciesRoute(choice, index_route, selected_routes[choice-1])
     # list containing all the solutions; easy output
     output_files = []
@@ -33,14 +33,20 @@ def get_user_choice(output_file_name: str, selected_distances: list[list[int]], 
        output_path = os.path.join(os.getcwd(), "output", output_files[i])
        os.makedirs(os.path.dirname(output_path), exist_ok = True)
        try:
-            with open(output_path, 'w') as file:
-                for node in pointsOrder[i]:
-                    file.write(f"{node}\n") #node already is 1-indexed
-                # remove last newline character to match output format
-                file.truncate(file.tell() - len(os.linesep))
+           with open(output_path, 'w') as file:
+               for node in pointsOrder[i]:
+                   file.write(f"{node}\n") #node already is 1-indexed
+               # remove last newline character IF it exists
+               file.seek(0, 2)  # go to end of file
+               current_pos = file.tell()
+               if current_pos > 0:
+                   file.seek(current_pos - 1)  # go back one char
+                   if file.read(1) == '\n':
+                       file.seek(current_pos - 1)  # go back to before newline
+                       file.truncate()
        except Exception as e:
-            print(f"Error writing to file: {e}\nAborting.")
-            exit()
+           print(f"Error writing to file: {e}\nAborting.")
+           exit()
     return output_files, choice
 
 def compute_possible_solutions() -> None:
@@ -79,7 +85,7 @@ def compute_possible_solutions() -> None:
     # "please select your choice 1 to 4:"
     index_route = indiciesList(input_data)
     file_solutions, choice = get_user_choice(output_file_name, selected_distances, selected_routes, index_route)
-    
+
     # Adding landing pad sites to the routes for image
     routes_with_centroids = []
     for i in range(choice):
@@ -87,7 +93,7 @@ def compute_possible_solutions() -> None:
         route_with_centroid = [centroid] + selected_routes[choice - 1][i] + [centroid]
         routes_with_centroids.append(route_with_centroid)
     visualize_routes(routes_with_centroids, selected_centroids[choice - 1], bounds, choice, output_file_name)
-    
+
     #use .join to seperate each file in the list by a comma
     separator = ", "
     print(f"Writing {separator.join(file_solutions)} to disk.")
@@ -148,7 +154,7 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
     plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', edgecolor ='none')
     plt.close()
     print(f"Image saved to disk as {output_file_name}")
-    return 
+    return
 
 
 #selected_routes[k].append(extract_route[1:-1])
