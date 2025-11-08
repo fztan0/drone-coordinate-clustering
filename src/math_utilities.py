@@ -40,8 +40,8 @@ def calcDimension(input_data: numpy.ndarray) -> numpy.array:
 def random_seed(bounds: numpy.array, k) -> numpy.array:
     minX = int(bounds[0])
     minY = int(bounds[1])
-    maxY = int(bounds[2])
-    maxX = int(bounds[3])
+    maxX = int(bounds[2])
+    maxY = int(bounds[3])
     #for each k element store (x,y) pair
     initialPad = numpy.zeros((k,2))
     for i in range(k):
