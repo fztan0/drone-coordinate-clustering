@@ -45,8 +45,6 @@ def get_user_choice(output_file_name: str, selected_distances: list[list[int]], 
     return output_files, choice
 
 def compute_possible_solutions() -> None:
-    print(f"ComputePossibleSolutions")
-
     input_file_name = get_file_name()
     input_data = load_file_coordinates(input_file_name)
     bounds = math_utilities.calcDimension(input_data)
