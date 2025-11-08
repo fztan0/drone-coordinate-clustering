@@ -1,30 +1,30 @@
 import file_handler
 import math_utilities
+import time
 import tsp_solver
 
 def main():
-    file_handler.compute_possible_solutions()
-    #input_data = file_handler.load_file_coordinates(file_handler.get_file_name())
-    #print(input_data)
-    #list = file_handler.indiciesList(input_data)
-    #print(list)
-    #bounds = math_utilities.calcDimension(input_data)
-    #index_route = file_handler.indiciesList(input_data)
-    #k = 3
-    # # clustering_assignment, new_centroids, iteration = tsp_solver.generate_k_means_clustering(3, input_data, bounds)
-    # # print(clustering_assignment)
-    # # print(new_centroids)
-    # # print(iteration)
-    #clustering_assignment, new_centroids, iteration = tsp_solver.generate_k_means_clustering(k, input_data, bounds)
-    #route = tsp_solver.generate_nearestNeighbor_route(clustering_assignment, new_centroids, k)
-    #pointsOrder = tsp_solver.indiciesRoute(k, index_route, route)
-    #print(pointsOrder)
-    # clustering_assignment, new_centroids, iteration, route, cluster_distance, total_distance = tsp_solver.generate_best_k_clusterings(k+1, input_data, bounds)
-    #print(route)
-    # print(cluster_distance)
+    print("starting algorithm execution...")
+    start_time = time.time()
 
+    try:
+        file_handler.compute_possible_solutions()
 
+        end_time = time.time()
+        total_runtime = end_time - start_time
+
+        print(f"total runtime: {total_runtime:.1f} seconds")
+
+        # also show in minutes and seconds if long runtime
+        if total_runtime >= 60:
+            minutes = int(total_runtime // 60)
+            seconds = total_runtime % 60
+            print(f"total runtime: {minutes} minutes and {seconds:.1f} seconds")
+
+    except Exception as e:
+        print(f"\n=== something screwed up somewhere ===")
+        end_time = time.time()
+        total_runtime = end_time - start_time
 
 if __name__ == "__main__":
     main()
-
