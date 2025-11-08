@@ -7,7 +7,7 @@ returning:
     1. Returns a list of arrays. Each index represents a k (0- (k-1)) which stores array of locations to visit
     2. Converged drone launch pads that are strategically placed to have high clustering
     3. Tracks the number of iterations it took to converge
-    NOTE: Clustering 
+    NOTE: Clustering
 """
 # def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[np.ndarray, np.array, np.ndarray]:
 def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[list[tuple[float,float]]], np.ndarray, int]:
@@ -16,7 +16,7 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
     oldClustering = initial_launch_pads
     iteration = 0
     while not converge:
-        #standard np would return a float for np.zeros but need to return a int 
+        #standard np would return a float for np.zeros but need to return a int
         clustering_assignment = np.zeros(len(points), dtype=int)
         #creates k lists inside of one global list
         #iterates through all the points
@@ -30,7 +30,7 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
                 calculateDistance = math_utilities.euclidean_distance(oldClustering[i], points[j])
                 if shortestDistance > calculateDistance:
                     shortestDistance = calculateDistance
-                    closestDrone = i 
+                    closestDrone = i
             #keeps track of the respective clustering for each point
             clustering_assignment[j] = closestDrone
         clustering_assignment.astype(int)
@@ -48,7 +48,7 @@ def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -
             if(cluster_array.size == 0):
                 new_centroid[i] = oldClustering[i]
             else:
-                #stack it from 1d to 2d. 
+                #stack it from 1d to 2d.
                 cluster_change = np.vstack(cluster_array)
                 x,y = math_utilities.generate_centroid(cluster_change)
                 new_centroid[i] = (x,y)
@@ -79,7 +79,7 @@ def compute_route_distance(route: list[list[tuple[float,float]]], k:int) -> np.a
   return total_cluster_distance
 
 #note: routes wont append the launch pad at the beginning & the end
-#n represents the size of the 
+#n represents the size of the
 """
 Returns routes starting from the launch pad to all of its respective cluster than back to the launch pad. Uses nearest neighbor implementation
 """
@@ -125,14 +125,14 @@ def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -
   route_distance = []
   bestIteration = 0
   centroid = []
-  for i in range(10):
+  for i in range(20):
     clustering_assignment, new_centroids, iteration = generate_k_means_clustering(k, points, bounds)
     route = generate_nearestNeighbor_route(clustering_assignment, new_centroids, k)
     distance_each_clustering = compute_route_distance(route, k)
     #round to the tenth's place
     round_distance = 0
     round_distance = np.ceil(distance_each_clustering)
-    #calculates the total distance 
+    #calculates the total distance
     total_distance = np.sum(round_distance)
     if(bestDistance > total_distance):
       clustering = clustering_assignment
@@ -144,7 +144,7 @@ def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -
   return clustering, centroid, bestIteration, bestRoute, route_distance, bestDistance
 
 #given a route attempts to match it with its respective location number (indicies + 1)
-#route parameter contains a list of k lists. inside each k lists is the clustering of the points 
+#route parameter contains a list of k lists. inside each k lists is the clustering of the points
 #selected_route that contains the coordinates of each route that we have to parse
 def indiciesRoute(k: int, route: dict, selected_route : list[list[tuple[float,float]]]) -> list[list[int]]:
   pointsOrder = [ [] for  _ in range(k)]
