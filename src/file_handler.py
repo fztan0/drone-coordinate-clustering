@@ -33,19 +33,14 @@ def get_user_choice(output_file_name: str, selected_distances: list[list[int]], 
        output_path = os.path.join(os.getcwd(), "output", output_files[i])
        os.makedirs(os.path.dirname(output_path), exist_ok = True)
        try:
-           with open(output_path, 'w') as file:
+           with open(output_path, 'w', encoding='utf-8') as file:
                for node in pointsOrder[i]:
                    file.write(f"{node}\n") #node already is 1-indexed
-               # remove last newline character IF it exists
-               file.seek(0, 2)  # go to end of file
-               current_pos = file.tell()
-               if current_pos > 0:
-                   file.seek(current_pos - 1)  # go back one char
-                   if file.read(1) == '\n':
-                       file.seek(current_pos - 1)  # go back to before newline
-                       file.truncate()
        except Exception as e:
-           print(f"Error writing to file: {e}\nAborting.")
+           print(f"Error writing to file: {e}")
+           print(f"Output path: {output_path}")
+           print(f"File name: {file_name}")
+           print(f"Aborting.")
            exit()
     return output_files, choice
 
