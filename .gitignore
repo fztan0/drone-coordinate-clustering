@@ -1,4 +1,5 @@
 output/
+ANN_Pathing_TSP_Example/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
