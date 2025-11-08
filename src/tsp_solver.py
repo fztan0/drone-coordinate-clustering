@@ -125,7 +125,7 @@ def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -
   route_distance = []
   bestIteration = 0
   centroid = []
-  for i in range(20):
+  for i in range(8):
     clustering_assignment, new_centroids, iteration = generate_k_means_clustering(k, points, bounds)
     route = generate_nearestNeighbor_route(clustering_assignment, new_centroids, k)
     distance_each_clustering = compute_route_distance(route, k)
