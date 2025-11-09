@@ -3,6 +3,7 @@ import os
 import math_utilities
 import tsp_solver
 import matplotlib.pyplot as plt
+import time
 
 def get_file_name() -> str:
     input_file_name = input("Enter the name of file: ")
@@ -55,6 +56,9 @@ def compute_possible_solutions() -> None:
     n = len(input_data)
     print(f"There are {n} nodes: Solutions will be available by 7:04am")
 
+    print("starting core algorithm execution...")
+    algorithm_start_time = time.time()
+
     roman_numerials = ["i", "ii","iii", "iv"]
     selected_distances = [ [] for  _ in range(4)]
     #for each k will store k routes
@@ -77,6 +81,19 @@ def compute_possible_solutions() -> None:
 
     # "please select your choice 1 to 4:"
     index_route = indiciesList(input_data)
+
+    # end timing the core algorithm execution
+    algorithm_end_time = time.time()
+    algorithm_runtime = algorithm_end_time - algorithm_start_time
+
+    print(f"Algorithm runtime: {algorithm_runtime:.1f} seconds")
+
+    # for longer runtimes, show minutes and seconds
+    if algorithm_runtime >= 60:
+        minutes = int(algorithm_runtime // 60)
+        seconds = algorithm_runtime % 60
+        print(f"Algorithm runtime: {minutes} minutes and {seconds:.1f} seconds")
+
     file_solutions, choice = get_user_choice(output_file_name, selected_distances, selected_routes, index_route)
 
     # Adding landing pad sites to the routes for image
