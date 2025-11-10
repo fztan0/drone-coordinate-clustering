@@ -145,8 +145,8 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
     center_y = (min_y + max_y) / 2
 
     buffer = max_range * 0.05
-    ax.set_xlim(max(0,center_x - max_range/ 2 - buffer), center_x + max_range / 2 + buffer)
-    ax.set_ylim(max(0,center_y - max_range/ 2 - buffer), center_y + max_range / 2 + buffer)
+    ax.set_xlim(center_x - max_range/ 2 - buffer, center_x + max_range / 2 + buffer)
+    ax.set_ylim(center_y - max_range/ 2 - buffer, center_y + max_range / 2 + buffer)
 
     plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', edgecolor ='none')
     plt.close()
