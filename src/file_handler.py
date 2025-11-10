@@ -114,34 +114,7 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
     colors = ['#800080', '#FFA500', '#00FF00', "#FF00D4"]
     min_x, min_y, max_x, max_y = bounds
 
-    # calculate data dimensions
-    width_range = abs(max_x - min_x)
-    height_range = abs(max_y - min_y)
-    if width_range == 0:
-        width_range = 1
-    if height_range == 0:
-        height_range = 1
-
-    # calculate aspect ratio and set figure size dynamically
-    data_aspect_ratio = height_range / width_range
-
-    # set base width and calculate height to match data aspect ratio
-    base_width = 10 # inches
-    fig_width = base_width
-    fig_height = base_width * data_aspect_ratio
-
-    # optionally cap the height if it gets too extreme
-    max_height = 20
-    if fig_height > max_height:
-        fig_height = max_height
-        fig_width = fig_height / data_aspect_ratio
-
-    # dynamically set canvas size to trimmed data space
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-
-
-
-
+    fig, ax = plt.subplots(figsize=(19.2, 10.8))
     ax.set_aspect('equal', adjustable='box')
 
     for k_index in range(k):
@@ -160,17 +133,22 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
     centroid_y = centroids[:k, 1]
     ax.scatter(centroid_x, centroid_y, color= "#0A4977", s =200, marker = '.', edgecolors='black', linewidths = 1, zorder = 3)
 
-    # add small buffer and set limits based on actual data bounds to avoid over trimming of white space
-    buffer_x = width_range * 0.05
-    buffer_y = height_range * 0.05
+    width_range = abs(max_x - min_x)
+    height_range = abs(max_y - min_y)
+    if width_range == 0:
+        width_range = 1
+    if height_range == 0:
+        height_range = 1
 
-    ax.set_xlim(min_x - buffer_x, max_x + buffer_x)
-    ax.set_ylim(min_y - buffer_y, max_y + buffer_y)
+    max_range = max(width_range, height_range)
+    center_x = (min_x + max_x) / 2
+    center_y = (min_y + max_y) / 2
 
+    buffer = max_range * 0.05
+    ax.set_xlim(center_x - max_range/ 2 - buffer, center_x + max_range / 2 + buffer)
+    ax.set_ylim(center_y - max_range/ 2 - buffer, center_y + max_range / 2 + buffer)
 
-
-    # https://stackoverflow.com/questions/47891830/matplotlib-tight-layout-remove-extra-white-empty-space
-    plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', dpi=150, edgecolor ='none')
+    plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', edgecolor ='none')
     plt.close()
     print(f"Image saved to disk as {output_file_name}")
     return
