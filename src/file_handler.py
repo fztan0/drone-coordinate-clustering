@@ -133,6 +133,8 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
 
     fig, ax = plt.subplots(figsize=(19.2, 10.8))
     ax.set_aspect('equal', adjustable='box')
+    plt.xlabel("x-axis")
+    plt.ylabel("y-axis")
 
     for k_index in range(k):
         route = routes[k_index]
