@@ -1,7 +1,6 @@
 import math_utilities
 import numpy as np
 import os
-import pandas as pd
 import time
 import tsp_solver_benchmark_ver
 from typing import List, Dict, Tuple
@@ -20,6 +19,8 @@ def run_benchmark_test(file_path: str, iteration_counts: List[int], k_values: Li
     n_points = len(input_data)
 
     print(f"Number of points: {n_points}")
+
+
 
     results = {
         'file_name': os.path.basename(file_path),
