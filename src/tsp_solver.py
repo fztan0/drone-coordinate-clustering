@@ -1,6 +1,9 @@
 import math_utilities
 import numpy as np
 import math
+import time
+import random
+import global_flag
 
 """
 returning:
@@ -11,6 +14,7 @@ returning:
 """
 # def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[np.ndarray, np.array, np.ndarray]:
 def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[list[tuple[float,float]]], np.ndarray, int]:
+    random.seed()
     converge = False
     initial_launch_pads = math_utilities.random_seed(bounds, k)
     oldClustering = initial_launch_pads
@@ -98,20 +102,38 @@ def generate_nearestNeighbor_route(k_cluster_array: list[list[tuple[float,float]
     #append the centroid since that is the starting point
     remaining_locations.append(starting_pad)
     routes[k_value].append(starting_pad)
-    shortestLocation = starting_pad
+    location = starting_pad
+    shortestLocation = None
+    secondShortestLocation = None
+    weight = [0.1, 0.9]
+    start_time = time.perf_counter()
     while len(remaining_locations) > 1:
       shortestNodeDist = math.inf
-      selectedLocation = shortestLocation
       #remove value
-      remaining_locations.remove(shortestLocation)
+      remaining_locations.remove(location)
       #iterates through remaining locations to find the shortest distance
       for x in remaining_locations:
         euclidean_distance = 0.0
-        euclidean_distance = math_utilities.euclidean_distance(selectedLocation,x)
+        euclidean_distance = math_utilities.euclidean_distance(location,x)
         if(shortestNodeDist > euclidean_distance):
+          if shortestLocation in remaining_locations:
+             secondShortestLocation = shortestLocation
+          else:
+             secondShortestLocation = None
           shortestNodeDist = euclidean_distance
           shortestLocation = x
-      location = shortestLocation
+      end_time = time.perf_counter()
+      if global_flag.anytime_flag == True and end_time - start_time < 60 and len(remaining_locations) != 2:
+        #edge case removing the secondShortestLocation if there is none.
+        outcome = [node for node in [secondShortestLocation, shortestLocation] if node in remaining_locations]
+        if len(outcome) == 1:
+          weight = [1]
+        else:
+          #Longer node has 1/10 probability
+          weight = [0.1,0.9]
+        location = random.choices(outcome, weights=weight, k=1)[0]
+      else: 
+        location = shortestLocation
       routes[k_value].append(location)
     #add the centroid at the end in order to do distance calculation
     routes[k_value].append(starting_pad)
@@ -125,10 +147,12 @@ def generate_best_k_clusterings(k: int , points: np.ndarray, bounds: np.array) -
   route_distance = []
   bestIteration = 0
   centroid = []
-  for i in range(1):
+  
+  for i in range(20):
     clustering_assignment, new_centroids, iteration = generate_k_means_clustering(k, points, bounds)
     route = generate_nearestNeighbor_route(clustering_assignment, new_centroids, k)
     distance_each_clustering = compute_route_distance(route, k)
+    global_flag.anytime_flag = True
     #round to the tenth's place
     round_distance = 0
     round_distance = np.ceil(distance_each_clustering)

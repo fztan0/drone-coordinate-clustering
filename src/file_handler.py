@@ -3,6 +3,7 @@ import os
 import math_utilities
 import tsp_solver
 import matplotlib.pyplot as plt
+import global_flag
 
 def get_file_name() -> str:
     input_file_name = input("Enter the name of file: ")
