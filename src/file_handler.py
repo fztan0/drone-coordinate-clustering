@@ -168,6 +168,8 @@ def visualize_routes(routes: list[list[tuple[float, float]]], centroids: numpy.n
     ax.set_ylim(min_y - buffer_y, max_y + buffer_y)
 
 
+
+    # https://stackoverflow.com/questions/47891830/matplotlib-tight-layout-remove-extra-white-empty-space
     plt.savefig(output_path, format='jpeg', bbox_inches = 'tight', dpi=150, edgecolor ='none')
     plt.close()
     print(f"Image saved to disk as {output_file_name}")
