@@ -1,6 +1,8 @@
 ANN_Pathing_TSP_Example/
+benchmark_analysis
 data/2circles.txt
 output/
+report
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
