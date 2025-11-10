@@ -1,7 +1,10 @@
-import math_utilities
+import sys
+import os
 import numpy as np
 import math
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import math_utilities
 
 def generate_k_means_clustering(k: int , points: np.ndarray, bounds: np.array) -> tuple[list[list[tuple[float,float]]], np.ndarray, int]:
     converge = False

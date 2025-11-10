@@ -1,9 +1,12 @@
-import math_utilities
 import numpy as np
 import os
+import sys
 import time
 import tsp_solver_benchmark_ver
 from typing import List, Dict, Tuple
+
+sys.path.append('src')
+import math_utilities
 
 def load_file_coordinates(file_path: str) -> np.ndarray:
     return np.loadtxt(file_path, dtype=np.float64)
@@ -125,23 +128,7 @@ def analyze_results(all_results: List[Dict]) -> None:
                 avg_time_per_k = total_time / 4  # assuming 4 k values, COME BACK TO THIS LATER
                 print(f"{iteration_count:<12} {total_time:<15.3f} {avg_time_per_k:<15.3f}")
 
-    print("\n\n3. DETAILED CLUSTER ANALYSIS (k = 4 only)")
-    print("-" * 50)
-
-    for result in all_results:
-        print(f"\nFile: {result['file_name']}")
-        print(f"{'Iterations':<12} {'k=4 Distance':<15} {'Cluster Breakdown':<25}")
-        print("-" * 55)
-
-        for iteration_count in iteration_counts:
-            if iteration_count in result['data']:
-                data = result['data'][iteration_count]
-                k4_distance = int(data['k_results'][4]['total_distance'])
-                cluster_distances = [int(d) for d in data['k_results'][4]['cluster_distances']]
-                breakdown = f"[{', '.join(map(str, cluster_distances))}]"
-                print(f"{iteration_count:<12} {k4_distance:<15} {breakdown:<25}")
-
-    print("\n\n4. CONVERGENCE ANALYSIS")
+    print("\n\n3. CONVERGENCE ANALYSIS")
     print("-" * 50)
 
     for result in all_results:
@@ -196,10 +183,6 @@ def main():
 
     if all_results:
         analyze_results(all_results)
-
-        print(f"\n{'='*80}")
-        print("BENCHMARK COMPLETE")
-        print(f"{'='*80}")
 
 if __name__ == "__main__":
     main()
