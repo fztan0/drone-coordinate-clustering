@@ -92,6 +92,9 @@ def main():
         try:
             result = calculate_objective_function(dataset_path)
             all_results.append(result)
+        except Exception as e:
+            print(f"Error processing {dataset_path}: {e}")
+            continue
 
     if all_results:
         table = create_table(all_results)
